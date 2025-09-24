@@ -1,0 +1,45 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Tenant {
+  id      String @id @default(cuid())
+  slug    String @unique // e.g., 'acme', 'globex'
+  plan    String @default("free") // 'free' or 'pro'
+  users   User[]
+  notes   Note[]
+}
+
+model User {
+  id        String  @id @default(cuid())
+  email     String  @unique
+  password  String // This will store the hashed password
+  role      String // 'admin' or 'member'
+  tenant    Tenant  @relation(fields: [tenantId], references: [id])
+  tenantId  String
+  notes     Note[]
+}
+
+model Note {
+  id        String   @id @default(cuid())
+  title     String
+  content   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // Link to the Tenant
+  tenant    Tenant @relation(fields: [tenantId], references: [id])
+  tenantId  String
+  
+  // Link to the User who created it
+  author    User   @relation(fields: [authorId], references: [id])
+  authorId  String
+}
