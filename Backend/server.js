@@ -18,7 +18,7 @@ const upgradeFeature= require("./routes/upgrade.route");
 const notesApi = require("./routes/notes.route");
 const userInformation = require("./routes/user.route");
 
-app.use("/", userInformation); // Error is likely here
+app.use("/auth", userInformation); // Error is likely here
 app.use('/', notesApi);
 app.use('/', upgradeFeature);
 
