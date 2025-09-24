@@ -19,8 +19,8 @@ const notesApi = require("./routes/notes.route");
 const userInformation = require("./routes/user.route");
 
 app.use("/auth", userInformation); // Error is likely here
-app.use('/', notesApi);
-app.use('/', upgradeFeature);
+app.use('/api', notesApi);
+app.use('/api', upgradeFeature);
 
 
 app.listen(PORT, () => {

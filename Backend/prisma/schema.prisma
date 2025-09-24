@@ -30,16 +30,12 @@ model User {
 
 model Note {
   id        String   @id @default(cuid())
+  content   String
   title     String
-  content   String?
+  tenantId  String
+  authorId  String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  
-  // Link to the Tenant
-  tenant    Tenant @relation(fields: [tenantId], references: [id])
-  tenantId  String
-  
-  // Link to the User who created it
-  author    User   @relation(fields: [authorId], references: [id])
-  authorId  String
+  tenant    Tenant   @relation(fields: [tenantId], references: [id])
+  author    User     @relation(fields: [authorId], references: [id])
 }
