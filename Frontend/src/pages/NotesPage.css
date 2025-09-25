@@ -38,6 +38,7 @@ body, html {
   padding: 30px;
   border-radius: 15px;
   margin-bottom: 30px;
+  border: 1px solid #dcdfe6;
   box-shadow: 0 3px 12px rgba(0,0,0,0.06);
 }
 
@@ -49,7 +50,7 @@ body, html {
 
 .note-title-input,
 .note-card textarea {
-  width: 100%;
+  width: 95%;
   padding: 12px;
   margin-bottom: 15px;
   border-radius: 8px;
@@ -106,10 +107,15 @@ th, td {
 
 th {
   background: #38a179ff;
+  color: #000000ff;
 }
 
 tr:nth-child(even) {
   background: #38a179ff;
+  color: #000000ff;
+}
+tr:nth-child(odd) {
+  color: #000000ff;
 }
 
 .actions-cell {
