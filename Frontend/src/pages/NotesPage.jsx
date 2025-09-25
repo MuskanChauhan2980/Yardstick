@@ -63,6 +63,37 @@ function NotesPage() {
     }
   };
 
+
+  // Upgrade tenant plan
+const handleUpgrade = async () => {
+  try {
+    const token = localStorage.getItem("token");
+    const tenantSlug = localStorage.getItem("tenantSlug"); // e.g. "acme" or "globex"
+
+    if (!token || !tenantSlug) {
+      alert("Missing token or tenant info. Please login again.");
+      navigate("/login");
+      return;
+    }
+
+    axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+
+    const response = await axios.post(`/api/tenants/${tenantSlug}/upgrade`);
+
+    alert(response.data.message || "Upgraded successfully to Pro!");
+    // Refresh notes after upgrade so user can add more
+    fetchNotes();
+  } catch (err) {
+    console.error("Failed to upgrade:", err);
+    if (err.response) {
+      alert(err.response.data.message || "Upgrade failed");
+    } else {
+      alert("Upgrade failed due to network error.");
+    }
+  }
+};
+
+
   // Delete note
   const handleDelete = async (id) => {
     try {
@@ -102,7 +133,10 @@ function NotesPage() {
         <h1 className="logo">NotesApp</h1>
         <div className="nav-buttons">
           <button onClick={() => navigate('/login')} className="login-btn">Login</button>
-          <button className="upgrade-btn">Upgrade to Pro</button>
+          <button onClick={handleUpgrade} className="upgrade-btn">
+  Upgrade to Pro
+</button>
+
         </div>
       </div>
 

@@ -1,46 +1,47 @@
-require("dotenv").config();
-const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
 const { PrismaClient } = require("@prisma/client");
- 
-
 const prisma = new PrismaClient();
 const SECRET_KEY = process.env.SECRET_KEY || "fallback_secret";
 
-
-
- const loginDetails =  async (req, res) => {
+// Login route
+const loginDetails = async (req, res) => {
   const { email, password } = req.body;
 
   try {
+    // 1. Find user
     const user = await prisma.user.findUnique({
       where: { email },
-      include: { tenant: true },
+      include: { tenant: true },  
     });
 
     if (!user) {
-      return res.status(400).json({ message: "Invalid credentials." });
+      return res.status(401).json({ message: "Invalid credentials" });
     }
 
-    const validPassword = await bcrypt.compare(password, user.password);
-    if (!validPassword) {
-      return res.status(400).json({ message: "Invalid credentials." });
+    // 2. Check password
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      return res.status(401).json({ message: "Invalid credentials" });
     }
 
+    // 3. Create JWT with tenantSlug
     const token = jwt.sign(
       {
         id: user.id,
         tenantId: user.tenantId,
+        tenantSlug: user.tenant.slug,  
         role: user.role,
       },
       SECRET_KEY,
-      { expiresIn: "24h" }
+      { expiresIn: "1h" }
     );
 
-    res.status(200).json({ token });
+    // 4. Respond with token
+    res.json({ token });
   } catch (error) {
     console.error("Login error:", error);
-    res.status(500).json({ message: "Internal server error." });
+    res.status(500).json({ message: "Internal server error" });
   }
 };
 
@@ -67,4 +68,4 @@ const getUserData = async (req, res) => {
   res.status(200).json({ status: "ok" });
 };
 
-module.exports={loginDetails,healthCheck}
+module.exports={loginDetails,healthCheck,getUserData}

@@ -11,7 +11,21 @@ function LoginPage({ onLogin }) {
     setError('');
     try {
       const response = await axios.post('http://localhost:3001/auth/login', { email, password });
-      onLogin(response.data.token);
+
+      const token = response.data.token;
+
+      // Save token in localStorage
+      localStorage.setItem('token', token);
+
+      // Decode JWT to extract tenantSlug
+      const decoded = JSON.parse(atob(token.split('.')[1]));
+      if (decoded.tenantSlug) {
+        localStorage.setItem('tenantSlug', decoded.tenantSlug);
+      }
+
+      // Keep existing callback
+      onLogin(token);
+
     } catch (err) {
       setError('Invalid credentials');
     }

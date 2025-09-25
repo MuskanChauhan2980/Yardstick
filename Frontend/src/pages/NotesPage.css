@@ -12,6 +12,8 @@ body, html {
  
  .navbar {
   width: 90%;
+  position: sticky;
+  top: 0;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -88,6 +90,11 @@ body, html {
   font-size: 1.8rem;
   font-weight: 700;
   color: #000000ff;
+}
+.notes-table-container {
+  width: 100%;
+  overflow-x: auto;
+  margin-top: 20px; /* spacing below note card/form */
 }
 
 /* Note card (form box) */
