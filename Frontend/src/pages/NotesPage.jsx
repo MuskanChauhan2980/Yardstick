@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import "./NotesPage.css";
-
+const BACKEND_URL = 'http://localhost:3001';
 function NotesPage() {
   const [user, setUser] = useState(null);
 
@@ -37,23 +37,40 @@ function NotesPage() {
     }
   };
 
-  const fetchUser = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) return;
+ 
 
-      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-      const response = await axios.get("/api/user"); // make sure this exists
-      setUser(response.data.user);
-    } catch (err) {
-      console.error("Failed to fetch user:", err);
-    }
-  };
+ const fetchUser = async () => {
+  const token = localStorage.getItem("token");
+  if (!token) {
+    navigate("/login");
+    return;
+  }
+  axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+  try {
+    const res = await axios.get(`${BACKEND_URL}/auth/user`);
+    setUser(res.data.user); // will trigger the second useEffect
+  } catch (err) {
+    console.error("Failed to fetch user:", err);
+    localStorage.removeItem("token");
+    navigate("/login");
+  }
+};
 
-  useEffect(() => {
+
+
+useEffect(() => {
+   fetchNotes()
+  fetchUser();
+}, []); // empty dependency → runs only once
+
+useEffect(() => {
+   fetchNotes()
+  if (user) {
     fetchNotes();
-    fetchUser();
-  }, []);
+  }
+}, [user]); // only runs when user changes
+
+
 
   // Create or update a note
   const handleSubmit = async (e) => {
@@ -150,7 +167,7 @@ function NotesPage() {
           </button>
           {user && user.role === "admin" && (
             <button onClick={handleUpgrade} className="upgrade-btn">
-              Upgrade
+              Upgrade to Pro
             </button>
           )}
         </div>
