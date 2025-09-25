@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Routes, Route, useNavigate } from 'react-router-dom';
-import LoginPage from './pages/LoginPage';
+import LoginPage from './pages/loginPage';
 import NotesPage from './pages/NotesPage';
 import axios from 'axios';
 
