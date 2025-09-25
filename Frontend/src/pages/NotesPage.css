@@ -1,17 +1,17 @@
-/* Full page center layout */
+/* This allows content to flow from top to bottom */
 body, html {
-  height: 100%;
+  min-height: 100vh;
   margin: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background: #f5f7fa; /* dark mode background */
+  background: #242424;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  display: flex; /* New: Use flex on the body */
+  flex-direction: column; /* New: Stack children vertically */
+  align-items: center; /* New: Center all children horizontally */
 }
 
- 
- .navbar {
-  width: 90%;
+/* The navbar should be a full-width element at the top */
+.navbar {
+  width: 100%;
   position: sticky;
   top: 0;
   display: flex;
@@ -20,9 +20,32 @@ body, html {
   background: linear-gradient(90deg, #6a11cb, #2575fc);
   padding: 15px 30px;
   border-radius: 12px;
-  margin-bottom: 25px;  /* spacing below navbar */
+  margin: 25px auto; /* Centered with a margin on top/bottom */
   box-shadow: 0 4px 15px rgba(0,0,0,0.1);
 }
+
+/* The new wrapper for the main content */
+.main-content-wrapper {
+  width: 100%;
+  max-width: 1200px; /* Aligns with your notes-container max-width */
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+}
+
+/* This is your main content card, now it will be properly centered */
+.notes-container {
+  width: 100%; /* Changed to 100% to fill the new wrapper */
+  background: #ffffff;
+  border-radius: 14px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+  padding: 40px;
+  margin-bottom: 40px; /* Added margin to the bottom for spacing */
+  display: flex;
+  flex-direction: column;
+}
+
+/* ... all your other CSS for h2, note-card, table, etc. remains the same */
 
 
 .logo {
@@ -70,18 +93,7 @@ body, html {
 
 
 
-.notes-container {
-  width: 90%;              
-  max-width: 1200px;       
-  min-height: 85vh;         
-  background: #ffffff;
-  border-radius: 14px;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
-  padding: 40px;   /* reduced from 100px so navbar doesn’t feel pushed too far */
-  margin-top: 40px; /* ⬅️ pushes whole card down from top of page */
-  display: flex;
-  flex-direction: column;
-}
+ 
 
 
 .notes-container h2 {

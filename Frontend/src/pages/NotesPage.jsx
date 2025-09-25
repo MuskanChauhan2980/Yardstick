@@ -1,4 +1,4 @@
- import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import './NotesPage.css';
@@ -63,36 +63,33 @@ function NotesPage() {
     }
   };
 
-
   // Upgrade tenant plan
-const handleUpgrade = async () => {
-  try {
-    const token = localStorage.getItem("token");
-    const tenantSlug = localStorage.getItem("tenantSlug"); // e.g. "acme" or "globex"
+  const handleUpgrade = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const tenantSlug = localStorage.getItem("tenantSlug"); // e.g. "acme" or "globex"
 
-    if (!token || !tenantSlug) {
-      alert("Missing token or tenant info. Please login again.");
-      navigate("/login");
-      return;
+      if (!token || !tenantSlug) {
+        alert("Missing token or tenant info. Please login again.");
+        navigate("/login");
+        return;
+      }
+
+      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+
+      const response = await axios.post(`/api/tenants/${tenantSlug}/upgrade`);
+
+      alert(response.data.message || "Upgraded successfully to Pro!");
+      fetchNotes();
+    } catch (err) {
+      console.error("Failed to upgrade:", err);
+      if (err.response) {
+        alert(err.response.data.message || "Upgrade failed");
+      } else {
+        alert("Upgrade failed due to network error.");
+      }
     }
-
-    axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-
-    const response = await axios.post(`/api/tenants/${tenantSlug}/upgrade`);
-
-    alert(response.data.message || "Upgraded successfully to Pro!");
-    // Refresh notes after upgrade so user can add more
-    fetchNotes();
-  } catch (err) {
-    console.error("Failed to upgrade:", err);
-    if (err.response) {
-      alert(err.response.data.message || "Upgrade failed");
-    } else {
-      alert("Upgrade failed due to network error.");
-    }
-  }
-};
-
+  };
 
   // Delete note
   const handleDelete = async (id) => {
@@ -118,6 +115,7 @@ const handleUpgrade = async () => {
     setNoteTitle('');
   };
 
+  // The loading block is now a simple centered div
   if (loading) {
     return (
       <div className="notes-container">
@@ -127,98 +125,97 @@ const handleUpgrade = async () => {
   }
 
   return (
-    <div className="notes-container">
-      {/* ✅ Navbar */}
+    <>
       <div className="navbar">
         <h1 className="logo">NotesApp</h1>
         <div className="nav-buttons">
           <button onClick={() => navigate('/login')} className="login-btn">Login</button>
           <button onClick={handleUpgrade} className="upgrade-btn">
-  Upgrade to Pro
-</button>
-
+            Upgrade to Pro
+          </button>
         </div>
       </div>
-
-      <h2>Your Notes</h2>
-
-      {/* Form */}
-      <div className="note-card">
-        <h3>{editingNote ? 'Edit Note' : 'Create New Note'}</h3>
-        <form onSubmit={handleSubmit}>
-          <input
-            type="text"
-            value={noteTitle}
-            onChange={(e) => setNoteTitle(e.target.value)}
-            placeholder="Note Title"
-            className="note-title-input"
-            required
-          />
-          <textarea
-            value={noteContent}
-            onChange={(e) => setNoteContent(e.target.value)}
-            placeholder="Write your note here..."
-            required
-          ></textarea>
-          <div className="form-buttons">
-            <button type="submit" className="create-btn">
-              {editingNote ? 'Update Note' : 'Create Note'}
-            </button>
-            {editingNote && (
-              <button
-                type="button"
-                onClick={handleCancel}
-                className="cancel-btn"
-              >
-                Cancel
-              </button>
-            )}
+      
+      {/* The main content wrapper centers the notes-container */}
+      <div className="main-content-wrapper">
+        <div className="notes-container">
+          <h2>Your Notes</h2>
+          <div className="note-card">
+            <h3>{editingNote ? 'Edit Note' : 'Create New Note'}</h3>
+            <form onSubmit={handleSubmit}>
+              <input
+                type="text"
+                value={noteTitle}
+                onChange={(e) => setNoteTitle(e.target.value)}
+                placeholder="Note Title"
+                className="note-title-input"
+                required
+              />
+              <textarea
+                value={noteContent}
+                onChange={(e) => setNoteContent(e.target.value)}
+                placeholder="Write your note here..."
+                required
+              ></textarea>
+              <div className="form-buttons">
+                <button type="submit" className="create-btn">
+                  {editingNote ? 'Update Note' : 'Create Note'}
+                </button>
+                {editingNote && (
+                  <button
+                    type="button"
+                    onClick={handleCancel}
+                    className="cancel-btn"
+                  >
+                    Cancel
+                  </button>
+                )}
+              </div>
+            </form>
           </div>
-        </form>
+          <div className="notes-table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Title</th>
+                  <th>Content</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {(notes || []).map((note) => (
+                  <tr key={note.id}>
+                    <td>{note.title}</td>
+                    <td>{note.content}</td>
+                    <td className="actions-cell">
+                      <button
+                        onClick={() => handleEdit(note)}
+                        className="edit-btn"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleDelete(note.id)}
+                        className="delete-btn"
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+                {notes.length === 0 && (
+                  <tr>
+                    <td colSpan="3" style={{ textAlign: 'center' }}>
+                      No notes available
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
-
-      {/* Notes Table */}
-      <div className="notes-table-container">
-        <table>
-          <thead>
-            <tr>
-              <th>Title</th>
-              <th>Content</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {(notes || []).map((note) => (
-              <tr key={note.id}>
-                <td>{note.title}</td>
-                <td>{note.content}</td>
-                <td className="actions-cell">
-                  <button
-                    onClick={() => handleEdit(note)}
-                    className="edit-btn"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => handleDelete(note.id)}
-                    className="delete-btn"
-                  >
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))}
-            {notes.length === 0 && (
-              <tr>
-                <td colSpan="3" style={{ textAlign: 'center' }}>
-                  No notes available
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
-    </div>
+    </>
   );
 }
 
