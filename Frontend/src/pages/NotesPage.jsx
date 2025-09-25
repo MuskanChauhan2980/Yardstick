@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import './NotesPage.css';
@@ -22,9 +22,8 @@ function NotesPage() {
         return;
       }
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-
       const response = await axios.get('/api/notes');
-      setNotes(response.data || []); // backend returns an array
+      setNotes(response.data || []);
     } catch (err) {
       console.error('Failed to fetch notes:', err);
       if (err.response && err.response.status === 401) {
@@ -64,7 +63,7 @@ function NotesPage() {
     }
   };
 
-  // Delete a note
+  // Delete note
   const handleDelete = async (id) => {
     try {
       await axios.delete(`/api/notes/${id}`);
@@ -74,7 +73,7 @@ function NotesPage() {
     }
   };
 
-  // Edit a note
+  // Edit note
   const handleEdit = (note) => {
     setEditingNote(note);
     setNoteContent(note.content);
@@ -98,6 +97,15 @@ function NotesPage() {
 
   return (
     <div className="notes-container">
+      {/* ✅ Navbar */}
+      <div className="navbar">
+        <h1 className="logo">NotesApp</h1>
+        <div className="nav-buttons">
+          <button onClick={() => navigate('/login')} className="login-btn">Login</button>
+          <button className="upgrade-btn">Upgrade to Pro</button>
+        </div>
+      </div>
+
       <h2>Your Notes</h2>
 
       {/* Form */}

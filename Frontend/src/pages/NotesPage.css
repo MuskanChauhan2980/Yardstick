@@ -5,11 +5,69 @@ body, html {
   display: flex;
   justify-content: center;
   align-items: center;
-  background: #f5f7fa; /* light background for contrast */
+  background: #f5f7fa; /* dark mode background */
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-/* Notes container */
+ 
+ .navbar {
+  width: 90%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(90deg, #6a11cb, #2575fc);
+  padding: 15px 30px;
+  border-radius: 12px;
+  margin-bottom: 25px;  /* spacing below navbar */
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+
+.logo {
+  font-size: 1.6rem;
+  font-weight: bold;
+  color: white;
+  letter-spacing: 1px;
+}
+
+.nav-buttons {
+  display: flex;
+  gap: 12px;
+}
+
+.login-btn,
+.upgrade-btn {
+  border: none;
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+/* Login button */
+.login-btn {
+  background: #ffffff;
+  color: #2575fc;
+}
+
+.login-btn:hover {
+  background: #f1f4ff;
+}
+
+/* Upgrade to Pro button */
+.upgrade-btn {
+  background: #ff8c42;
+  color: white;
+}
+
+.upgrade-btn:hover {
+  background: #ff7a20;
+}
+
+
+
 .notes-container {
   width: 90%;              
   max-width: 1200px;       
@@ -17,11 +75,11 @@ body, html {
   background: #ffffff;
   border-radius: 14px;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
-  padding: 100px;            
+  padding: 40px;   /* reduced from 100px so navbar doesn’t feel pushed too far */
+  margin-top: 40px; /* ⬅️ pushes whole card down from top of page */
   display: flex;
   flex-direction: column;
 }
-
 
 
 .notes-container h2 {
@@ -38,8 +96,10 @@ body, html {
   padding: 30px;
   border-radius: 15px;
   margin-bottom: 30px;
-  border: 1px solid #dcdfe6;
-  box-shadow: 0 3px 12px rgba(0,0,0,0.06);
+  /* border: 1px solid #dcdfe6;
+  box-shadow: 0 3px 12px rgba(0,0,0,0.06); */
+  border: 1px solid #e6e0ff;   /* softer lavender border */
+  box-shadow: 0 4px 16px rgba(106, 17, 203, 0.15); /* purple glow */
 }
 
 .note-card h3 {
@@ -96,6 +156,9 @@ body, html {
 table {
   width: 100%;
   border-collapse: collapse;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(37, 117, 252, 0.12); /* blue glow */
 }
 
 th, td {
@@ -106,15 +169,26 @@ th, td {
 }
 
 th {
-  background: #38a179ff;
-  color: #000000ff;
+  background: linear-gradient(90deg, #6a11cb, #2575fc);
+  color: #fff;
+  padding: 14px;
+  font-size: 15px;
+  text-align: left;
+}
+
+td {
+  padding: 12px;
+  font-size: 14px;
+  color: #333;
+  border-bottom: 1px solid #e6e0ff;
 }
 
 tr:nth-child(even) {
-  background: #38a179ff;
+   background: #f5f7ff; /* very light blue */
   color: #000000ff;
 }
 tr:nth-child(odd) {
+  background: #ffffff;
   color: #000000ff;
 }
 
@@ -135,20 +209,27 @@ tr:nth-child(odd) {
 }
 
 .edit-btn {
-  background-color: #86494f;;
+  background-color: #2575fc; /* modern blue */
   color: white;
 }
 
 .delete-btn {
-  background-color: #5f4f6f;
+  background-color: #e74c3c; /* modern red */
   color: white;
 }
+
 
 .edit-btn:hover,
 .delete-btn:hover {
   opacity: 0.85;
 }
 
+.edit-btn:hover {
+  background-color: #1a5fd1;
+}
+.delete-btn:hover {
+  background-color: #c0392b;
+}
 .cancel-btn {
   background: #51c2c4ff;
   color: #fff;

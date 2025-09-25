@@ -22,7 +22,7 @@ function LoginPage({ onLogin }) {
       <style>{`
         body {
           font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-          background: linear-gradient(135deg, #6a11cb, #2575fc);
+          background: #242424;
           height: 100vh;
           display: flex;
           align-items: center;
@@ -30,78 +30,67 @@ function LoginPage({ onLogin }) {
           margin: 0;
         }
 
-        .login-container {
-          background: #fff;
-          padding: 2rem 2.5rem;
-          border-radius: 16px;
-          box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        .login-card {
+          background: #ffffff;
+          padding: 40px 35px;
+          border-radius: 15px;
+          box-shadow: 0 4px 16px rgba(106, 17, 203, 0.15);
           width: 360px;
           text-align: center;
-          animation: fadeIn 0.6s ease-in-out;
         }
 
-        .login-container h2 {
-          margin-bottom: 1.5rem;
+        .login-card h2 {
           font-size: 1.8rem;
-          color: #333;
+          font-weight: 700;
+          color: #000000ff;
+          margin-bottom: 25px;
         }
 
-        .login-container form {
+        .login-card form {
           display: flex;
           flex-direction: column;
         }
 
-        .login-container input {
-          margin-bottom: 1rem;
+        .login-card input {
+          margin-bottom: 15px;
           padding: 12px;
-          border: 1px solid #ccc;
-          border-radius: 12px;
+          border-radius: 8px;
+          border: 1px solid #dcdfe6;
           font-size: 1rem;
+          transition: border 0.2s ease, box-shadow 0.2s ease;
           outline: none;
-          transition: border-color 0.3s ease;
         }
 
-        .login-container input:focus {
+        .login-card input:focus {
           border-color: #2575fc;
-          box-shadow: 0 0 6px rgba(37, 117, 252, 0.4);
+          box-shadow: 0 0 6px rgba(37, 117, 252, 0.3);
         }
 
-        .login-container button {
-          background: #2575fc;
+        .login-card button {
+          background: #4f37de;
           color: #fff;
           padding: 12px;
           border: none;
-          border-radius: 12px;
+          border-radius: 8px;
           font-size: 1rem;
           font-weight: 600;
           cursor: pointer;
-          transition: background 0.3s ease;
+          transition: background 0.2s ease;
         }
 
-        .login-container button:hover {
-          background: #1b5ed9;
+        .login-card button:hover {
+          background: #1a5fd1;
         }
 
         .error {
-          margin-top: 1rem;
+          margin-top: 10px;
           color: #e74c3c;
           font-size: 0.95rem;
           font-weight: 500;
         }
-
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-            transform: translateY(-15px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
       `}</style>
 
-      <div className="login-container">
+      <div className="login-card">
         <h2>Login</h2>
         <form onSubmit={handleSubmit}>
           <input 
