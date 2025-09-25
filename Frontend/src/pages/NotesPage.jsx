@@ -1,12 +1,14 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
-import './NotesPage.css';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import "./NotesPage.css";
 
 function NotesPage() {
+  const [user, setUser] = useState(null);
+
   const [notes, setNotes] = useState([]);
-  const [noteContent, setNoteContent] = useState('');
-  const [noteTitle, setNoteTitle] = useState('');
+  const [noteContent, setNoteContent] = useState("");
+  const [noteTitle, setNoteTitle] = useState("");
   const [editingNote, setEditingNote] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -16,27 +18,41 @@ function NotesPage() {
   const fetchNotes = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
       if (!token) {
-        navigate('/login');
+        navigate("/login");
         return;
       }
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-      const response = await axios.get('/api/notes');
+      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+      const response = await axios.get("/api/notes");
       setNotes(response.data || []);
     } catch (err) {
-      console.error('Failed to fetch notes:', err);
+      console.error("Failed to fetch notes:", err);
       if (err.response && err.response.status === 401) {
-        localStorage.removeItem('token');
-        navigate('/login');
+        localStorage.removeItem("token");
+        navigate("/login");
       }
     } finally {
       setLoading(false);
     }
   };
 
+  const fetchUser = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+
+      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+      const response = await axios.get("/api/user"); // make sure this exists
+      setUser(response.data.user);
+    } catch (err) {
+      console.error("Failed to fetch user:", err);
+    }
+  };
+
   useEffect(() => {
     fetchNotes();
+    fetchUser();
   }, []);
 
   // Create or update a note
@@ -50,16 +66,16 @@ function NotesPage() {
         });
         setEditingNote(null);
       } else {
-        await axios.post('/api/notes', {
+        await axios.post("/api/notes", {
           content: noteContent,
           title: noteTitle,
         });
       }
-      setNoteContent('');
-      setNoteTitle('');
+      setNoteContent("");
+      setNoteTitle("");
       fetchNotes();
     } catch (err) {
-      alert('Failed to save note. Maybe plan limit reached.');
+      alert("Failed to save note. Maybe plan limit reached.");
     }
   };
 
@@ -97,7 +113,7 @@ function NotesPage() {
       await axios.delete(`/api/notes/${id}`);
       fetchNotes();
     } catch (err) {
-      console.error('Failed to delete note:', err);
+      console.error("Failed to delete note:", err);
     }
   };
 
@@ -111,8 +127,8 @@ function NotesPage() {
   // Cancel edit
   const handleCancel = () => {
     setEditingNote(null);
-    setNoteContent('');
-    setNoteTitle('');
+    setNoteContent("");
+    setNoteTitle("");
   };
 
   // The loading block is now a simple centered div
@@ -129,19 +145,23 @@ function NotesPage() {
       <div className="navbar">
         <h1 className="logo">NotesApp</h1>
         <div className="nav-buttons">
-          <button onClick={() => navigate('/login')} className="login-btn">Login</button>
-          <button onClick={handleUpgrade} className="upgrade-btn">
-            Upgrade to Pro
+          <button onClick={() => navigate("/login")} className="login-btn">
+            Login
           </button>
+          {user && user.role === "admin" && (
+            <button onClick={handleUpgrade} className="upgrade-btn">
+              Upgrade
+            </button>
+          )}
         </div>
       </div>
-      
+
       {/* The main content wrapper centers the notes-container */}
       <div className="main-content-wrapper">
         <div className="notes-container">
           <h2>Your Notes</h2>
           <div className="note-card">
-            <h3>{editingNote ? 'Edit Note' : 'Create New Note'}</h3>
+            <h3>{editingNote ? "Edit Note" : "Create New Note"}</h3>
             <form onSubmit={handleSubmit}>
               <input
                 type="text"
@@ -159,7 +179,7 @@ function NotesPage() {
               ></textarea>
               <div className="form-buttons">
                 <button type="submit" className="create-btn">
-                  {editingNote ? 'Update Note' : 'Create Note'}
+                  {editingNote ? "Update Note" : "Create Note"}
                 </button>
                 {editingNote && (
                   <button
@@ -205,7 +225,7 @@ function NotesPage() {
                 ))}
                 {notes.length === 0 && (
                   <tr>
-                    <td colSpan="3" style={{ textAlign: 'center' }}>
+                    <td colSpan="3" style={{ textAlign: "center" }}>
                       No notes available
                     </td>
                   </tr>

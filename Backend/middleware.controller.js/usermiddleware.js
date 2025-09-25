@@ -21,6 +21,7 @@ const authenticate = async (req, res, next) => {
       id: decoded.id,
       tenantId: decoded.tenantId,
       role: decoded.role,
+      plan:decoded.plan
     };
 
     next();
