@@ -39,62 +39,60 @@ function NotesPage() {
 
  
 
- const fetchUser = async () => {
-  const token = localStorage.getItem("token");
-  if (!token) {
-    navigate("/login");
-    return;
-  }
-  axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-  try {
-    const res = await axios.get(`${BACKEND_URL}/auth/user`);
-    setUser(res.data.user); // will trigger the second useEffect
-  } catch (err) {
-    console.error("Failed to fetch user:", err);
-    localStorage.removeItem("token");
-    navigate("/login");
-  }
-};
-
+ 
 
 
 useEffect(() => {
-   fetchNotes()
-  fetchUser();
-}, []); // empty dependency → runs only once
+  const initialize = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) return navigate("/login");
 
-useEffect(() => {
-   fetchNotes()
-  if (user) {
-    fetchNotes();
-  }
-}, [user]); // only runs when user changes
+    axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+
+    try {
+      const userRes = await axios.get(`${BACKEND_URL}/auth/user`);
+      setUser(userRes.data.user);
+
+      const notesRes = await axios.get(`${BACKEND_URL}/api/notes`);
+      setNotes(notesRes.data || []);
+    } catch (err) {
+      console.error(err);
+      localStorage.removeItem("token");
+      navigate("/login");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  initialize();
+}, []);
 
 
 
   // Create or update a note
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      if (editingNote) {
-        await axios.put(`/api/notes/${editingNote.id}`, {
-          content: noteContent,
-          title: noteTitle,
-        });
-        setEditingNote(null);
-      } else {
-        await axios.post("/api/notes", {
-          content: noteContent,
-          title: noteTitle,
-        });
-      }
-      setNoteContent("");
-      setNoteTitle("");
-      fetchNotes();
-    } catch (err) {
-      alert("Failed to save note. Maybe plan limit reached.");
+  e.preventDefault();
+  const newNote = { title: noteTitle, content: noteContent };
+  setNotes(prev => editingNote 
+    ? prev.map(n => n.id === editingNote.id ? { ...n, ...newNote } : n)
+    : [...prev, { ...newNote, id: Date.now() }]); // temporary id
+  setNoteContent("");
+  setNoteTitle("");
+
+  try {
+    if (editingNote) {
+      await axios.put(`${BACKEND_URL}/api/notes/${editingNote.id}`, newNote);
+      setEditingNote(null);
+    } else {
+      await axios.post(`${BACKEND_URL}/api/notes`, newNote);
     }
-  };
+  } catch (err) {
+    alert("Failed to save. Refreshing...");
+    fetchNotes(); // rollback
+  }
+};
+
+
 
   // Upgrade tenant plan
   const handleUpgrade = async () => {
@@ -125,14 +123,15 @@ useEffect(() => {
   };
 
   // Delete note
-  const handleDelete = async (id) => {
-    try {
-      await axios.delete(`/api/notes/${id}`);
-      fetchNotes();
-    } catch (err) {
-      console.error("Failed to delete note:", err);
-    }
-  };
+ const handleDelete = async (id) => {
+  setNotes(prev => prev.filter(note => note.id !== id)); // remove immediately
+  try {
+    await axios.delete(`${BACKEND_URL}/api/notes/${id}`);
+  } catch (err) {
+    alert("Failed to delete. Refreshing...");
+    fetchNotes(); // rollback
+  }
+};
 
   // Edit note
   const handleEdit = (note) => {

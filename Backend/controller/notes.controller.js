@@ -4,7 +4,7 @@ const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
 
- const getNotes =  async (req, res) => {
+const getNotes = async (req, res) => {
   try {
     const notes = await prisma.note.findMany({
       where: { tenantId: req.user.tenantId },
@@ -18,7 +18,7 @@ const prisma = new PrismaClient();
 
 
 
- const postNotes =  async (req, res) => {
+const postNotes = async (req, res) => {
   const { title, content } = req.body;
 
   try {
@@ -55,7 +55,7 @@ const prisma = new PrismaClient();
   }
 };
 
-const getNotesById =  async (req, res) => {
+const getNotesById = async (req, res) => {
   const { id } = req.params;
 
   try {
@@ -82,14 +82,27 @@ const updateNotesById = async (req, res) => {
   const { id } = req.params;
   const { title, content } = req.body;
 
+  if (!id) return res.status(400).json({ message: "Note ID is required" });
+
   try {
+    // 1️⃣ Find the note first
+    const note = await prisma.note.findUnique({
+      where: { id }, // string id
+    });
+
+    if (!note) return res.status(404).json({ message: "Note not found" });
+
+    // 2️⃣ Check tenant authorization
+    if (note.tenantId !== req.user.tenantId) {
+      return res.status(403).json({ message: "Not authorized to update this note" });
+    }
+
+    // 3️⃣ Update the note
     const updatedNote = await prisma.note.update({
-      where: {
-        id,
-        tenantId: req.user.tenantId,
-      },
+      where: { id }, // only the unique id
       data: { title, content },
     });
+
     res.status(200).json(updatedNote);
   } catch (error) {
     console.error("Error updating note:", error);
@@ -98,27 +111,46 @@ const updateNotesById = async (req, res) => {
 };
 
 
-const deleteNotesById =  async (req, res) => {
-  const { id } = req.params;
+
+const deleteNoteById = async (req, res) => {
+  const { id } = req.params; // id comes as string from URL
+
+  if (!id) {
+    return res.status(400).json({ message: "Note ID is required" });
+  }
 
   try {
-    await prisma.note.delete({
-      where: {
-        id,
-        tenantId: req.user.tenantId,
-      },
+  
+    const note = await prisma.note.findUnique({
+      where: { id }, // keep it as string
     });
-    res.status(204).send(); // 204 No Content
+
+    if (!note) {
+      return res.status(404).json({ message: "Note not found" });
+    }
+ 
+    if (note.tenantId !== req.user.tenantId) {
+      return res.status(403).json({ message: "Not authorized to delete this note" });
+    }
+
+   
+    await prisma.note.delete({
+      where: { id },
+    });
+
+    res.status(200).json({ message: "Note deleted successfully" });
   } catch (error) {
     console.error("Error deleting note:", error);
-    res.status(500).json({ message: "Internal server error." });
+    res.status(500).json({ message: "Internal server error" });
   }
 };
 
-module.exports={
-    getNotes,
-    postNotes,
-    getNotesById,
-    updateNotesById,
-    deleteNotesById 
+
+
+module.exports = {
+  getNotes,
+  postNotes,
+  getNotesById,
+  updateNotesById,
+  deleteNoteById
 }
