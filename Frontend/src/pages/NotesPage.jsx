@@ -108,7 +108,7 @@ useEffect(() => {
 
       axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
-      const response = await axios.post(`/api/tenants/${tenantSlug}/upgrade`);
+      const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/tenants/${tenantSlug}/upgrade`);
 
       alert(response.data.message || "Upgraded successfully to Pro!");
       fetchNotes();
