@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import "./NotesPage.css";
-const BACKEND_URL = 'http://localhost:3001';
+ 
 function NotesPage() {
   const [user, setUser] = useState(null);
 
@@ -50,10 +50,10 @@ useEffect(() => {
     axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
     try {
-      const userRes = await axios.get(`${BACKEND_URL}/auth/user`);
+      const userRes = await axios.get(`${import.meta.env.VITE_API_URL}/auth/user`);
       setUser(userRes.data.user);
 
-      const notesRes = await axios.get(`${BACKEND_URL}/api/notes`);
+      const notesRes = await axios.get(`${import.meta.env.VITE_API_URL}/api/notes`);
       setNotes(notesRes.data || []);
     } catch (err) {
       console.error(err);
@@ -81,10 +81,10 @@ useEffect(() => {
 
   try {
     if (editingNote) {
-      await axios.put(`${BACKEND_URL}/api/notes/${editingNote.id}`, newNote);
+      await axios.put(`${import.meta.env.VITE_API_URL}/api/notes/${editingNote.id}`, newNote);
       setEditingNote(null);
     } else {
-      await axios.post(`${BACKEND_URL}/api/notes`, newNote);
+      await axios.post(`${import.meta.env.VITE_API_URL}/api/notes`, newNote);
     }
   } catch (err) {
     alert("Failed to save. Refreshing...");
@@ -126,7 +126,7 @@ useEffect(() => {
  const handleDelete = async (id) => {
   setNotes(prev => prev.filter(note => note.id !== id)); // remove immediately
   try {
-    await axios.delete(`${BACKEND_URL}/api/notes/${id}`);
+    await axios.delete(`${import.meta.env.VITE_API_URL}/api/notes/${id}`);
   } catch (err) {
     alert("Failed to delete. Refreshing...");
     fetchNotes(); // rollback
