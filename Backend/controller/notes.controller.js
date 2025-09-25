@@ -85,19 +85,17 @@ const updateNotesById = async (req, res) => {
   if (!id) return res.status(400).json({ message: "Note ID is required" });
 
   try {
-    // 1️⃣ Find the note first
+  
     const note = await prisma.note.findUnique({
       where: { id }, // string id
     });
 
     if (!note) return res.status(404).json({ message: "Note not found" });
 
-    // 2️⃣ Check tenant authorization
+ 
     if (note.tenantId !== req.user.tenantId) {
       return res.status(403).json({ message: "Not authorized to update this note" });
     }
-
-    // 3️⃣ Update the note
     const updatedNote = await prisma.note.update({
       where: { id }, // only the unique id
       data: { title, content },
